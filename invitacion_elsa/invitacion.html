@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación de Cumpleaños - Flor de Luna</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f0f8ff; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        #gif-container {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d2a4a; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; 
+            opacity: 1;
+            transition: opacity 0.5s ease-out; 
+        }
+
+        #gif-container.hidden {
+            opacity: 0;
+            pointer-events: none; 
+        }
+
+        #elsa-gif {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; 
+        }
+
+        .invitation-card {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2); 
+            border: 5px solid #4a90e2; 
+            padding: 30px;
+            max-width: 500px;
+            width: 100%; 
+            text-align: center;
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: opacity 0.15s ease-out, transform 0.10s ease-out; 
+            z-index: 999; 
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .invitation-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .header-title {
+            color: #4a90e2; 
+            font-family: 'Dancing Script', cursive; 
+            font-size: 3rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .subtitle {
+            color: #7a7a7a;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .name {
+            color: #00bfff; 
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .details-box {
+            background-color: #e6f7ff; 
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 25px; 
+        }
+
+        .detail-item {
+            font-family: 'Poppins', sans-serif;
+            color: #333333;
+            font-size: 1.1rem;
+            margin: 8px 0;
+            font-weight: 600;
+        }
+
+        .detail-label {
+            color: #4a90e2; 
+            font-weight: 700;
+            margin-right: 5px;
+        }
+
+        .footer-note {
+            margin-top: 25px;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .btn-whatsapp {
+            background-color: #25D366;
+            border-color: #25D366;
+            color: white;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1EAF55;
+            border-color: #1EAF55;
+            color: white;
+        }
+
+        .snowflake {
+            color: #00bfff;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Estilos para la Cuenta Regresiva --- */
+        #countdown-container {
+            margin: 20px 0;
+        }
+        
+        #countdown-button {
+            margin-bottom: 10px; 
+        }
+
+        #countdown {
+            background-color: #4a90e2; 
+            color: white;
+            padding: 15px 10px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none; 
+            transition: all 0.5s ease;
+        }
+        
+        #countdown.visible {
+            display: flex; 
+            justify-content: space-around;
+        }
+
+        #countdown div {
+            display: inline-block;
+            margin: 0 5px;
+            text-align: center;
+        }
+
+        #countdown span {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #ffcc00; 
+        }
+        
+        #countdown small {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            color: #e6f7ff;
+        }
+        /* -------------------------------------- */
+
+        /* --- Estilos para la Galería (MODIFICADO para carrusel) --- */
+        #gallery-section {
+            margin-top: 30px;
+            padding: 20px 0;
+            border-top: 2px solid #a6c8f0;
+        }
+
+        #gallery-button {
+            margin-bottom: 20px;
+        }
+
+        #memories-gallery {
+            display: none; 
+            flex-direction: column; 
+            align-items: center;
+            padding: 10px;
+            background-color: #e6f7ff;
+            border-radius: 10px;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.8s ease-in-out, opacity 0.5s ease-in-out;
+            overflow: hidden; 
+        }
+
+        #memories-gallery.visible {
+            display: flex; 
+            max-height: 1000px; 
+            opacity: 1;
+        }
+        
+        #carousel-image {
+            width: 100%;
+            max-width: 300px; 
+            height: 250px; 
+            /* ¡CAMBIO CLAVE AQUÍ! DE 'cover' a 'contain' */
+            object-fit: contain; 
+            background-color: #e6f7ff; /* Color de fondo del contenedor de la galería */
+            border-radius: 8px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 1; 
+        }
+
+        #carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .carousel-control-btn {
+            background-color: #00bfff; 
+            border-color: #00bfff;
+            color: white;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-control-btn:hover {
+            background-color: #009acd;
+            border-color: #009acd;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="gif-container">
+        <img id="elsa-gif" src="https://th.bing.com/th/id/R.00396935a03769343ecc67d6d171a4c9?rik=U3aWXWPEC4dTsQ&pid=ImgRaw&r=0" alt="Elsa creando magia">
+    </div>
+
+    
+    <div class="invitation-card" id="invitationCard">
+        <h1 class="header-title">
+            <span class="snowflake">❄️</span> ¡Te Invitamos a Celebrar! <span class="snowflake">❄️</span>
+        </h1>
+        <p class="subtitle">
+            Mi pequeña princesa cumple 2 años...
+        </p>
+
+        <p class="name">
+            Flor de Luna Rodriguez Espinoza
+        </p>
+        
+        <p class="h4 text-secondary">
+            ¡Con la magia de Elsa y Frozen!
+        </p>
+        
+        <div id="countdown-container">
+            <button id="countdown-button" class="btn btn-primary btn-lg">
+                <span class="snowflake">⏳</span> Ver Cuenta Regresiva <span class="snowflake">⏳</span>
+            </button>
+            <div id="countdown"></div>
+        </div>
+        
+        <div class="details-box">
+            <div class="detail-item">
+                <span class="detail-label">🗓️ Fecha:</span> 25/11/2025
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">🕓 Hora:</span> 4:00 PM
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">🏠 Lugar:</span> En mi casa
+            </div>
+            <div class="detail-item text-primary">
+                <span class="detail-label">👸 Cumple:</span> 2 Años
+            </div>
+        </div>
+        
+        <div id="gallery-section">
+            <button id="gallery-button" class="btn btn-secondary btn-lg">
+                <span class="snowflake">⭐</span> Ver Galería de Recuerdos <span class="snowflake">⭐</span>
+            </button>
+            
+            <div id="memories-gallery">
+                <img id="carousel-image" src="https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/588406868_1723575985266293_2479756627158407571_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=WlVWP72uQqAQ7kNvwGRb_b5&_nc_oc=AdlzFe7EqgVWP4tTEb8BLcWSp0kgR9nzxFZUmhGR5mhhza5SD1NlnC70e1UKE-l9a5tWUzOYokH6XBj0o2tg0usF&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=18txehJtz3RT-n6q4Gghlg&oh=00_Afj3iGaIL0E3p5ScAft25gewWac-Z8s7df_mU-VkoZ3jaA&oe=69290C90" alt="Recuerdo de Flor de Luna">
+                <div id="carousel-controls">
+                    <button id="prev-btn" class="btn carousel-control-btn">Anterior</button>
+                    <button id="next-btn" class="btn carousel-control-btn">Siguiente</button>
+                </div>
+            </div>
+        </div>
+        
+        <a id="rsvpButton" href="#" class="btn btn-whatsapp btn-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp me-2" viewBox="0 0 16 16">
+                <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.925c0 1.398.366 2.726 1.054 3.974l-.992 3.603 3.71-.976A7.886 7.886 0 0 0 7.994 16h.001c4.367 0 7.934-3.558 7.937-7.925c-.003-1.638-.506-3.218-1.424-4.577zM7.994 14.521a6.388 6.388 0 0 1-2.912-.767l-.145-.084-1.465.385.399-1.428-.1-.157a6.368 6.368 0 0 1-1.049-3.411c-.004-3.535 2.87-6.42 6.417-6.421c1.71 0 3.323.68 4.542 1.905c1.22 1.225 1.9 2.834 1.903 4.546c-.003 3.535-2.87 6.42-6.418 6.421zm3.321-4.992c-.067-.033-.298-.152-.346-.c-.048-.018-.083-.027-.118.027c-.035.054-.135.17-.165.205c-.03.035-.06.039-.112.015c-.052-.025-.22-.081-.418-.258c-.198-.177-.33-.443-.37-.516c-.04-.073-.004-.112.022-.138c.025-.025.054-.06.082-.089c.028-.028.038-.053.056-.089c-.035.009-.066-.006-.096c-.014-.03-.118-.282-.162-.385c-.044-.103-.357-.306-.49-.306c-.134 0-.232-.019-.3-.019c-.068 0-.153.012-.234.106c-.08.094-.306.299-.306.732c0 .433.313.847.357.902c.044.055.617.943 1.493 1.348c.877.404 1.042.36 1.233.342c.191-.018.59-.241.674-.472c.084-.23.084-.427.059-.472c-.025-.045-.091-.073-.191-.129z"/>
+            </svg>
+            Confirmar Asistencia (RSVP)
+        </a>
+
+        <p class="footer-note">
+            ¡Será un día congeladamente divertido! ¡Esperamos tu confirmación!
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Declaración de Elementos ---
+            const elsaGif = document.getElementById('elsa-gif');
+            const gifContainer = document.getElementById('gif-container');
+            const invitationCard = document.getElementById('invitationCard');
+            
+            // Elementos del Contador
+            const countdownButton = document.getElementById('countdown-button');
+            const countdownElement = document.getElementById('countdown');
+
+            // Elementos de la Galería
+            const galleryButton = document.getElementById('gallery-button');
+            const memoriesGallery = document.getElementById('memories-gallery');
+            const carouselImage = document.getElementById('carousel-image');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            // Array de imágenes para el carrusel (usa las URLs de tus fotos)
+            const images = [
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/588406868_1723575985266293_2479756627158407571_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=WlVWP72uQqAQ7kNvwGRb_b5&_nc_oc=AdlzFe7EqgVWP4tTEb8BLcWSp0kgR9nzxFZUmhGR5mhhza5SD1NlnC70e1UKE-l9a5tWUzOYokH6XBj0o2tg0usF&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=18txehJtz3RT-n6q4Gghlg&oh=00_Afj3iGaIL0E3p5ScAft25gewWac-Z8s7df_mU-VkoZ3jaA&oe=69290C90",
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/588601334_1723576061932952_4965439767844228401_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5G4l6z6slpEQ7kNvwHbWoGL&_nc_oc=Adm32M7JxbxVll4JAQh5OaFhrf8hK0jPyj6nXwS8CqO2cGKYK1uFN9ULtRpB_tmk_bO5un9v__vc7Py40kymGKyv&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=ssFpUS3hcoEgXhgIx7-uDQ&oh=00_Afi5lCju_Ts3OUJ5-oLVl6_q7EmWVCX_mCkruSrp3P7PZQ&oe=69290E9B",
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/587558499_1723576205266271_676912795609568577_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=EWyGsqB-TroQ7kNvwH7Y5gD&_nc_oc=AdmhpgvaHRBPXad4NORIxyY0am-Q_IhgUjx2LN69QotRqTxC9qRf6lYFO7QH-Ly8PdoesCeDhx2YxGdo5_yNY16M&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=Ew93-GajrKphgwDLLOC4Wg&oh=00_AfgQ2v-e9wjzGzsKheFfbrLZLSWYlPmBdVQ7MVTczLrXKA&oe=6929192B",
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/587825019_1723576105266281_2423966401412843782_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=YobTGO_kJnIQ7kNvwGm4hcj&_nc_oc=AdnoE_VzuoLeghPyQkf-0HVQs2_5yaxbKoiD2mxNpyxXuWUiCkWP6LVjwyF9pgPy6AgcFuFs32UHxys_6JHLX8fa&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=qWrz54QJoizTTYetvo-wAw&oh=00_AfgYpsnJZb1y8UxApDc3b6VKIUqMVyKyMxAiTfuK3vz_1Q&oe=692926FD",
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/587825019_1723576105266281_2423966401412843782_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=833d8c&_nc_ohc=YobTGO_kJnIQ7kNvwGm4hcj&_nc_oc=AdnoE_VzuoLeghPyQkf-0HVQs2_5yaxbKoiD2mxNpyxXuWUiCkWP6LVjwyF9pgPy6AgcFuFs32UHxys_6JHLX8fa&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=qWrz54QJoizTTYetvo-wAw&oh=00_AfgYpsnJZb1y8UxApDc3b6VKIUqMVyKyMxAiTfuK3vz_1Q&oe=692926FD",
+                "https://scontent.fnog4-1.fna.fbcdn.net/v/t39.30808-6/587229708_1723576158599609_4614200652411648044_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=CzTxOPSU9pEQ7kNvwHezWZh&_nc_oc=AdmWIog14e6U6CVeINr1DQ9lArFceCaq_aEs9Snwyn1cKxydl_wmOKSQI0Pa14s3wGXRIfH4GrvPVF97hkXxNYKB&_nc_zt=23&_nc_ht=scontent.fnog4-1.fna&_nc_gid=hIzX6-ZqxtybDm61WWUstg&oh=00_AfieF3Yj1n9qqCsVdTkT6AIpTla_DD3Yb_2W6QZnERsdkQ&oe=692924A6"
+            ];
+            let currentImageIndex = 0; 
+            
+            // 1. Lógica para mostrar la invitación después del GIF (Sin cambios)
+            const gifDuration = 1500; 
+            invitationCard.classList.remove('show'); 
+            
+            const showInvitation = () => {
+                setTimeout(() => {
+                    gifContainer.classList.add('hidden'); 
+                    setTimeout(() => {
+                        gifContainer.style.display = 'none'; 
+                        invitationCard.classList.add('show'); 
+                    }, 500); 
+                }, gifDuration);
+            };
+
+            elsaGif.onload = showInvitation;
+            if (elsaGif.complete) {
+                showInvitation();
+            }
+
+            // 2. Lógica de la Cuenta Regresiva (Sin cambios)
+            const eventDate = new Date(2025, 10, 25, 16, 0, 0).getTime(); 
+            let interval = null; 
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                const formattedHours = hours < 10 ? '0' + hours : hours;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+
+                if (distance < 0) {
+                    clearInterval(interval);
+                    countdownElement.innerHTML = "🎉 **¡ES HOY!** ¡A Celebrar! 🎉";
+                    countdownButton.textContent = "🥳 ¡Ya Llegó el Cumpleaños! 🥳";
+                    countdownButton.disabled = true; 
+                } else {
+                    countdownElement.innerHTML = `
+                        <div><span>${days}</span><small>Días</small></div>
+                        <div><span>${formattedHours}</span><small>Horas</small></div>
+                        <div><span>${formattedMinutes}</span><small>Minutos</small></div>
+                        <div><span>${formattedSeconds}</span><small>Segundos</small></div>
+                    `;
+                }
+            }
+            
+            function toggleCountdown() {
+                if (countdownElement.classList.contains('visible')) {
+                    countdownElement.classList.remove('visible');
+                    clearInterval(interval);
+                    countdownButton.innerHTML = '<span class="snowflake">⏳</span> Ver Cuenta Regresiva <span class="snowflake">⏳</span>';
+                } else {
+                    countdownElement.classList.add('visible');
+                    updateCountdown(); 
+                    interval = setInterval(updateCountdown, 1000);
+                    countdownButton.innerHTML = '<span class="snowflake">❌</span> Ocultar Cuenta Regresiva <span class="snowflake">❌</span>';
+                }
+            }
+
+            countdownButton.addEventListener('click', toggleCountdown);
+            
+            if (eventDate < new Date().getTime()) {
+                toggleCountdown();
+            }
+
+            // 3. Lógica de la Galería de Recuerdos (MODIFICADA para carrusel)
+            function showImage(index) {
+                carouselImage.style.opacity = '0'; 
+                setTimeout(() => {
+                    carouselImage.src = images[index];
+                    carouselImage.style.opacity = '1'; 
+                }, 300); 
+            }
+
+            function nextImage() {
+                currentImageIndex = (currentImageIndex + 1) % images.length;
+                showImage(currentImageIndex);
+            }
+
+            function prevImage() {
+                currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+                showImage(currentImageIndex);
+            }
+
+            // Inicializa la primera imagen al cargar la página
+            showImage(currentImageIndex); 
+
+            // Asigna los eventos a los botones del carrusel
+            prevBtn.addEventListener('click', prevImage);
+            nextBtn.addEventListener('click', nextImage);
+
+            function toggleGallery() {
+                if (memoriesGallery.classList.contains('visible')) {
+                    memoriesGallery.classList.remove('visible');
+                    galleryButton.innerHTML = '<span class="snowflake">⭐</span> Ver Galería de Recuerdos <span class="snowflake">⭐</span>';
+                } else {
+                    memoriesGallery.classList.add('visible');
+                    galleryButton.innerHTML = '<span class="snowflake">❌</span> Ocultar Galería <span class="snowflake">❌</span>';
+                    // Al mostrar la galería, asegúrate de que se muestre la primera imagen
+                    showImage(currentImageIndex); 
+                }
+            }
+            
+            // 4. Asignar el evento al botón de la galería
+            galleryButton.addEventListener('click', toggleGallery);
+
+
+            // 5. Configuración del botón de WhatsApp (sin cambios)
+            const phoneNumber = '5216321137686'; 
+            const message = encodeURIComponent(
+                "¡Hola! 🥳🥳🥳 \n❄Confirmo la asistencia al cumpleaños de 👑 Flor de Luna 👑 el 25/11/2025.❄\n\n🩵¡Nos vemos!🩵"
+            );
+            const whatsappLink = `https://wa.me/${phoneNumber}?text=${message}`;
+            document.getElementById('rsvpButton').href = whatsappLink;
+        });
+    </script>
+</body>
+</html>
